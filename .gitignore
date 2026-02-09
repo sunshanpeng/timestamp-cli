@@ -1,0 +1,23 @@
+# Binaries
+timestamp
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test Output
+*.out
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+.claude/
