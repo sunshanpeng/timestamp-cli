@@ -34,7 +34,7 @@ Download pre-built binaries from [GitHub Releases](https://github.com/sunshanpen
 ```bash
 git clone https://github.com/sunshanpeng/timestamp-cli.git
 cd timestamp-cli
-go build -o timestamp
+go build -o timestamp ./cmd/timestamp
 ```
 
 ## Usage
@@ -181,7 +181,7 @@ go test -cover ./...
 ### Build
 
 ```bash
-go build -o timestamp
+go build -o timestamp ./cmd/timestamp
 ```
 
 ## Contributing
