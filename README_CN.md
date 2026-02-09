@@ -34,7 +34,7 @@ go install github.com/sunshanpeng/timestamp-cli@latest
 ```bash
 git clone https://github.com/sunshanpeng/timestamp-cli.git
 cd timestamp-cli
-go build -o timestamp
+go build -o timestamp ./cmd/timestamp
 ```
 
 ## 使用方法
@@ -181,7 +181,7 @@ go test -cover ./...
 ### 构建
 
 ```bash
-go build -o timestamp
+go build -o timestamp ./cmd/timestamp
 ```
 
 ## 贡献
