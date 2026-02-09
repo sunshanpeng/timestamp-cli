@@ -14,6 +14,7 @@ A simple and fast command-line tool for handling timestamp conversions.
 - ✅ Convert timestamp to human-readable format
 - ✅ Convert date string to timestamp
 - ✅ Smart recognition (10-digit = seconds, 13-digit = milliseconds)
+- ✅ Relative time parsing (e.g., -5m, +1h)
 - ✅ UTC timezone support
 - ✅ Multiple date format support
 
@@ -93,6 +94,19 @@ timestamp "2026/01/19 16:00:00"  # YYYY/MM/DD HH:MM:SS
 timestamp "2026/01/19"           # YYYY/MM/DD
 ```
 
+### Relative Time Parsing
+
+```bash
+# Get timestamp 5 minutes ago
+timestamp -5m
+
+# Get timestamp 1 hour from now
+timestamp +1h
+
+# Get millisecond timestamp 30 seconds ago
+timestamp --ms -30s
+```
+
 ### UTC Timezone Support
 
 ```bash
@@ -141,6 +155,13 @@ timestamp -v
 - `2006-01-02` (Date only)
 - `2006/01/02 15:04:05` (Datetime with slashes)
 - `2006/01/02` (Date with slashes)
+
+## Supported Relative Time Units
+
+- `s`: Seconds (e.g., `-30s`)
+- `m`: Minutes (e.g., `-5m`)
+- `h`: Hours (e.g., `+1h`)
+- `d`: Days (e.g., `-1d`)
 
 ## Use Cases
 

@@ -13,8 +13,8 @@ func Convert(inputType parser.InputType, t time.Time, outputMS bool) string {
 	case parser.SecondTimestamp, parser.MillisecondTimestamp:
 		// 时间戳转日期字符串
 		return t.Format("2006-01-02 15:04:05")
-	case parser.DateString:
-		// 日期字符串转时间戳
+	case parser.DateString, parser.RelativeTime:
+		// 日期字符串/相对时间转时间戳
 		if outputMS {
 			return strconv.FormatInt(t.UnixMilli(), 10)
 		}

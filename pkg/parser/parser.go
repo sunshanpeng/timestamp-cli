@@ -15,6 +15,7 @@ const (
 	SecondTimestamp
 	MillisecondTimestamp
 	DateString
+	RelativeTime
 )
 
 // ParseInput 解析输入字符串，识别类型并转换为时间对象
@@ -26,13 +27,23 @@ func ParseInput(input string, loc *time.Location) (InputType, time.Time, error) 
 		return parseTimestamp(input, loc)
 	}
 
+	// 尝试解析为相对时间
+	if inputType, t, err := parseRelativeTime(input, loc); err == nil {
+		return inputType, t, nil
+	}
+
 	// 尝试解析为日期字符串
 	return parseDateString(input, loc)
 }
 
 // isNumeric 检查字符串是否为纯数字
 func isNumeric(s string) bool {
-	_, err := strconv.ParseInt(s, 10, 64)
+	// 处理负数情况
+	if strings.HasPrefix(s, "-") {
+		_, err := strconv.ParseInt(s, 10, 64)
+		return err == nil
+	}
+	_, err := strconv.ParseUint(s, 10, 64)
 	return err == nil
 }
 
@@ -43,7 +54,14 @@ func parseTimestamp(input string, loc *time.Location) (InputType, time.Time, err
 		return Unknown, time.Time{}, err
 	}
 
-	switch len(input) {
+	// 处理负数时间戳（1970之前）
+	// 判断长度时忽略负号
+	lenInput := len(input)
+	if timestamp < 0 {
+		lenInput--
+	}
+
+	switch lenInput {
 	case 10:
 		// 秒级时间戳
 		return SecondTimestamp, time.Unix(timestamp, 0).In(loc), nil
@@ -73,4 +91,40 @@ func parseDateString(input string, loc *time.Location) (InputType, time.Time, er
 	}
 
 	return Unknown, time.Time{}, errors.New("unsupported date format (expected: 2006-01-02 15:04:05, 2006-01-02, 2006/01/02 15:04:05, or 2006/01/02)")
+}
+
+// parseRelativeTime 解析相对时间字符串
+// 支持格式：-5m, +1h, 30s (默认为+), -1d
+// 单位支援：s(秒), m(分), h(时), d(天)
+func parseRelativeTime(input string, loc *time.Location) (InputType, time.Time, error) {
+	if len(input) < 2 {
+		return Unknown, time.Time{}, errors.New("invalid relative time format")
+	}
+
+	unit := input[len(input)-1]
+	valueStr := input[:len(input)-1]
+
+	// 处理 '+' 前缀（可选）
+	valueStr = strings.TrimPrefix(valueStr, "+")
+
+	val, err := strconv.ParseInt(valueStr, 10, 64)
+	if err != nil {
+		return Unknown, time.Time{}, err
+	}
+
+	duration := time.Duration(0)
+	switch unit {
+	case 's':
+		duration = time.Duration(val) * time.Second
+	case 'm':
+		duration = time.Duration(val) * time.Minute
+	case 'h':
+		duration = time.Duration(val) * time.Hour
+	case 'd':
+		duration = time.Duration(val) * 24 * time.Hour
+	default:
+		return Unknown, time.Time{}, errors.New("invalid time unit (expected s, m, h, or d)")
+	}
+
+	return RelativeTime, time.Now().In(loc).Add(duration), nil
 }

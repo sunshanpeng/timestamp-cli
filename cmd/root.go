@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -30,16 +31,19 @@ var rootCmd = &cobra.Command{
   - 获取当前时间戳（秒级/毫秒级）
   - 时间戳转日期字符串
   - 日期字符串转时间戳
+  - 相对时间解析（如 -5m, +1h）
   - UTC 时区支持
 
 示例：
   timestamp                           # 显示完整信息
   timestamp -s                        # 仅输出秒级时间戳
-  timestamp -ms                       # 仅输出毫秒级时间戳
+  timestamp --ms                      # 仅输出毫秒级时间戳
   timestamp 1768809600                # 时间戳转日期
   timestamp "2026-01-19 16:00:00"     # 日期转时间戳
-  timestamp -utc                      # UTC 时区完整信息
-  timestamp -tz                       # 显示时区信息`,
+  timestamp -5m                       # 5分钟前的时间戳
+  timestamp +1h                       # 1小时后的时间戳
+  timestamp --utc                     # UTC 时区完整信息
+  timestamp --tz                      # 显示时区信息`,
 	Run: run,
 }
 
@@ -52,6 +56,34 @@ func init() {
 }
 
 func Execute() {
+	// 处理以 - 开头的相对时间参数（如 -5m）
+	// Cobra 会将其误认为是 flag，所以如果发现看起来像相对时间的参数，
+	// 且之前没有 -- 分隔符，则在前面插入 --
+	args := os.Args[1:]
+	hasDashDash := false
+	for _, arg := range args {
+		if arg == "--" {
+			hasDashDash = true
+			break
+		}
+	}
+
+	if !hasDashDash {
+		re := regexp.MustCompile(`^-\d+[smhd]$`)
+		newArgs := make([]string, 0, len(args)+1)
+		inserted := false
+		for _, arg := range args {
+			if !inserted && re.MatchString(arg) {
+				newArgs = append(newArgs, "--")
+				inserted = true
+			}
+			newArgs = append(newArgs, arg)
+		}
+		if inserted {
+			rootCmd.SetArgs(newArgs)
+		}
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
