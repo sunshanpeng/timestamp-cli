@@ -22,7 +22,7 @@ A simple and fast command-line tool for handling timestamp conversions.
 ### Using Go Install (Recommended)
 
 ```bash
-go install github.com/sunshanpeng/timestamp-cli@latest
+go install github.com/sunshanpeng/timestamp-cli/cmd/timestamp@latest
 ```
 
 ### Download Binary
