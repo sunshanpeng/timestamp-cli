@@ -20,7 +20,7 @@ var (
 	showVersion bool
 )
 
-const version = "1.0.0"
+const version = "1.0.4"
 
 var rootCmd = &cobra.Command{
 	Use:   "timestamp [input]",
