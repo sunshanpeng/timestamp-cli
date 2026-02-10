@@ -23,7 +23,7 @@
 ### 使用 Go Install（推荐）
 
 ```bash
-go install github.com/sunshanpeng/timestamp-cli@latest
+go install github.com/sunshanpeng/timestamp-cli/cmd/timestamp@latest
 ```
 
 ### 下载二进制文件
